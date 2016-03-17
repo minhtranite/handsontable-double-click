@@ -15,7 +15,7 @@ bower install --save handsontable-double-click
 <html lang='en'>
   <head>
     <meta charset='UTF-8'>
-    <title>Handsontable Select Plus</title>
+    <title>Handsontable double click</title>
     <link rel='stylesheet'
       href='bower_components/handsontable/dist/handsontable.full.css'>
     <script src='bower_components/handsontable/dist/handsontable.full.js'></script>
