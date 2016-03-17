@@ -40,35 +40,36 @@
     this.init = function () {
       bindMouseEvents.call(this);
 
-      var settings = this.getSettings();
+      var instance = this;
+      var settings = instance.getSettings();
 
       Handsontable.hooks.add('dblClick', function (row, col) {
         if (settings.dblClick) {
-          settings.dblClick(row, col);
+          settings.dblClick(row, col, instance);
         }
       });
 
       Handsontable.hooks.add('dblClickCell', function (row, col) {
         if (settings.dblClickCell) {
-          settings.dblClickCell(row, col);
+          settings.dblClickCell(row, col, instance);
         }
       });
 
       Handsontable.hooks.add('dblClickColHeader', function (col) {
         if (settings.dblClickColHeader) {
-          settings.dblClickColHeader(col);
+          settings.dblClickColHeader(col, instance);
         }
       });
 
       Handsontable.hooks.add('dblClickRowHeader', function (row) {
         if (settings.dblClickRowHeader) {
-          settings.dblClickRowHeader(row);
+          settings.dblClickRowHeader(row, instance);
         }
       });
 
       Handsontable.hooks.add('dblClickCorner', function (row, col) {
         if (settings.dblClickCorner) {
-          settings.dblClickCorner(row, col);
+          settings.dblClickCorner(row, col, instance);
         }
       });
     };

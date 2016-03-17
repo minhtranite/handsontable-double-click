@@ -33,19 +33,22 @@ bower install --save handsontable-double-click
       var hot = new Handsontable(container, {
         colHeaders: true,
         rowHeaders: true,
-        dblClick: function (row, col) {
+        dblClick: function (row, col, instance) {
           log('dbClick  ' + row + ' ' + col);
         },
-        dblClickCell: function (row, col) {
+        dblClickCell: function (row, col, instance) {
           log('dbClickCell ' + row + ' ' + col);
+          console.log(instance.getDataAtCell(row, col));
         },
-        dblClickColHeader: function (col) {
+        dblClickColHeader: function (col, instance) {
           log('dblClickColHeader ' + col);
+          console.log(instance.getDataAtCol(col));
         },
-        dblClickRowHeader: function (row) {
+        dblClickRowHeader: function (row, instance) {
           log('dblClickRowHeader ' + row);
+          console.log(instance.getDataAtRow(row));
         },
-        dblClickCorner: function (row, col) {
+        dblClickCorner: function (row, col, instance) {
           log('dblClickConner ' + row + ' ' + col);
         }
       });
