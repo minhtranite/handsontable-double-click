@@ -1,80 +1,77 @@
 (function (Handsontable) {
+  Handsontable.hooks.register('dblClick');
+  Handsontable.hooks.register('dblClickCell');
+  Handsontable.hooks.register('dblClickColHeader');
+  Handsontable.hooks.register('dblClickRowHeader');
+  Handsontable.hooks.register('dblClickCorner');
+
   function DoubleClick() {
     var plugin = this;
     var eventManager = Handsontable.eventManager(this);
+    var instance = null;
 
-    var bindMouseEvents = function () {
-      var instance = this;
-      eventManager.addEventListener(instance.rootElement, 'dblclick', function (e) {
-        var target = e.target;
-        if (['TD', 'TH'].indexOf(target.nodeName) === -1) {
-          target = Handsontable.Dom.closest(target, 'TH') || Handsontable.Dom.closest(target, 'TD');
-        }
-        if (!target) {
-          return;
-        }
-        var coords = instance.view.wt.wtTable.getCoords(target);
-        var row = coords.row;
-        var col = coords.col;
+    Handsontable.hooks.add('dblClick', function (row, col) {
+      if (instance.getSettings().dblClick) {
+        instance.getSettings().dblClick(row, col, instance);
+      }
+    });
 
-        plugin.dblCLick(row, col);
+    Handsontable.hooks.add('dblClickCell', function (row, col) {
+      if (instance.getSettings().dblClickCell) {
+        instance.getSettings().dblClickCell(row, col, instance);
+      }
+    });
 
-        if (row >= 0 && col >= 0) {
-          plugin.dblClickCell(row, col);
-        }
+    Handsontable.hooks.add('dblClickColHeader', function (col) {
+      if (instance.getSettings().dblClickColHeader) {
+        instance.getSettings().dblClickColHeader(col, instance);
+      }
+    });
 
-        if (row < 0) {
-          plugin.dblClickColHeader(col);
-        }
+    Handsontable.hooks.add('dblClickRowHeader', function (row) {
+      if (instance.getSettings().dblClickRowHeader) {
+        instance.getSettings().dblClickRowHeader(row, instance);
+      }
+    });
 
-        if (col < 0) {
-          plugin.dblClickRowHeader(row);
-        }
+    Handsontable.hooks.add('dblClickCorner', function (row, col) {
+      if (instance.getSettings().dblClickCorner) {
+        instance.getSettings().dblClickCorner(row, col, instance);
+      }
+    });
 
-        if (row < 0 && col < 0) {
-          plugin.dblClickCorner(row, col);
-        }
-      });
+    var handleDblClick = function (e) {
+      var target = e.target;
+      if (['TD', 'TH'].indexOf(target.nodeName) === -1) {
+        target = Handsontable.Dom.closest(target, 'TH') || Handsontable.Dom.closest(target, 'TD');
+      }
+      if (!target) {
+        return;
+      }
+      var coords = instance.view.wt.wtTable.getCoords(target);
+      var row = coords.row;
+      var col = coords.col;
+      plugin.dblClick(row, col);
+      if (row >= 0 && col >= 0) {
+        plugin.dblClickCell(row, col);
+      }
+      if (row < 0) {
+        plugin.dblClickColHeader(col);
+      }
+      if (col < 0) {
+        plugin.dblClickRowHeader(row);
+      }
+      if (row < 0 && col < 0) {
+        plugin.dblClickCorner(row, col);
+      }
     };
 
     this.init = function () {
-      bindMouseEvents.call(this);
-
-      var instance = this;
-      var settings = instance.getSettings();
-
-      Handsontable.hooks.add('dblClick', function (row, col) {
-        if (settings.dblClick) {
-          settings.dblClick(row, col, instance);
-        }
-      });
-
-      Handsontable.hooks.add('dblClickCell', function (row, col) {
-        if (settings.dblClickCell) {
-          settings.dblClickCell(row, col, instance);
-        }
-      });
-
-      Handsontable.hooks.add('dblClickColHeader', function (col) {
-        if (settings.dblClickColHeader) {
-          settings.dblClickColHeader(col, instance);
-        }
-      });
-
-      Handsontable.hooks.add('dblClickRowHeader', function (row) {
-        if (settings.dblClickRowHeader) {
-          settings.dblClickRowHeader(row, instance);
-        }
-      });
-
-      Handsontable.hooks.add('dblClickCorner', function (row, col) {
-        if (settings.dblClickCorner) {
-          settings.dblClickCorner(row, col, instance);
-        }
-      });
+      instance = this;
+      eventManager.addEventListener(instance.rootElement, 'dblclick', handleDblClick);
     };
 
-    this.dblCLick = function (row, col) {
+    this.dblClick = function (row, col) {
       Handsontable.hooks.run(this, 'dblClick', row, col);
     };
 
@@ -92,20 +89,25 @@
 
     this.dblClickCorner = function (row, col) {
       Handsontable.hooks.run(this, 'dblClickCorner', row, col);
+    };
+
+    this.destroy = function () {
+      eventManager.removeEventListener(instance.rootElement, 'dblclick', handleDblClick);
     }
   }
 
   var doubleClick = new DoubleClick();
 
-  Handsontable.hooks.add('beforeInit', function () {
+  Handsontable.hooks.add('afterInit', function () {
     doubleClick.init.call(this);
   });
+
   Handsontable.hooks.add('afterUpdateSettings', function () {
+    doubleClick.destroy();
     doubleClick.init.call(this);
   });
-  Handsontable.hooks.register('dblClick');
-  Handsontable.hooks.register('dblClickCell');
-  Handsontable.hooks.register('dblClickColHeader');
-  Handsontable.hooks.register('dblClickRowHeader');
-  Handsontable.hooks.register('dblClickCorner');
+
+  Handsontable.hooks.add('afterDestroy', function () {
+    doubleClick.destroy();
+  });
 })(Handsontable);
